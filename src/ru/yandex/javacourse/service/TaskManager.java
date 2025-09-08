@@ -1,9 +1,13 @@
+package ru.yandex.javacourse.service;
+
+import ru.yandex.javacourse.model.*;
+
 import java.util.*;
 
 public class TaskManager {
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    private final HashMap<Integer, Task> tasks = new HashMap<>();
+    private final HashMap<Integer, Epic> epics = new HashMap<>();
+    private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
     private static int nextId = 1;
 
     // МЕТОДЫ ДЛЯ ЗАДАЧ
@@ -83,8 +87,8 @@ public class TaskManager {
     }
 
     public void updateEpic(Epic epic) {
-        epic.setStatus(epics.get(epic.getId()).getStatus());
         epics.put(epic.getId(), epic);
+        epics.get(epic.getId()).setStatus(calculateEpicStatus(epic.getId()));
     }
 
     // МЕТОДЫ ДЛЯ ПОДЗАДАЧ
@@ -96,6 +100,7 @@ public class TaskManager {
         ArrayList<Integer> epicSubtasks = currentEpic.getSubtaskIds();
         epicSubtasks.add(subtask.getId());
         nextId++;
+        currentEpic.setStatus(calculateEpicStatus(currentEpic.getId()));
         return subtask;
     }
 
@@ -111,13 +116,21 @@ public class TaskManager {
     }
 
     public void deleteSubtaskById(int id) {
-        epics.get(subtasks.get(id).getEpicId()).getSubtaskIds().remove(id);
+        Subtask subtask = subtasks.get(id);
+        if (subtask == null) return;
+        int epicId = subtask.getEpicId();
+        Epic epic = epics.get(epicId);
+        if (epic != null) {
+            epic.getSubtaskIds().remove(Integer.valueOf(id));
+            epic.setStatus(calculateEpicStatus(epicId));
+        }
         subtasks.remove(id);
     }
 
     public void deleteAllSubtask() {
         for (Epic epic : epics.values()) {
             epic.getSubtaskIds().clear();
+            epic.setStatus(calculateEpicStatus(epic.getId()));
         }
         subtasks.clear();
     }
@@ -140,7 +153,8 @@ public class TaskManager {
                 countDone++;
             }
         }
-        if (countNew == 0) {
+
+        if (countNew == 0 && countDone > 0) {
             return Status.DONE;
         } else if (countNew > 0 && countDone > 0) {
             return Status.IN_PROGRESS;

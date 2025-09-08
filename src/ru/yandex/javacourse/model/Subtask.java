@@ -1,3 +1,5 @@
+package ru.yandex.javacourse.model;
+
 public class Subtask extends Task {
     private int epicId;
 
@@ -15,11 +17,11 @@ public class Subtask extends Task {
     }
     @Override
     public String toString() {
-        return "Subtask{" +
+        return "ru.yandex.javacourse.model.Subtask{" +
                 "name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", id=" + getId() +
-                ", status=" + status +
+                ", status=" + getStatus() +
                 ", epicId=" + epicId +
                 '}';
     }

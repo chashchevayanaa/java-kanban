@@ -1,5 +1,6 @@
+package ru.yandex.javacourse.model;
+
 import java.util.ArrayList;
-import java.util.List;
 
 public class Epic extends Task {
     private ArrayList<Integer> subtaskIds;
@@ -17,11 +18,11 @@ public class Epic extends Task {
     }
     @Override
     public String toString() {
-        return "Epic{" +
+        return "ru.yandex.javacourse.model.Epic{" +
                 "name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", id=" + getId() +
-                ", status=" + status +
+                ", status=" + getStatus() +
                 ", subtaskIds=" + subtaskIds +
                 '}';
     }
