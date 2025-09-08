@@ -17,7 +17,7 @@ public class Subtask extends Task {
     }
     @Override
     public String toString() {
-        return "ru.yandex.javacourse.model.Subtask{" +
+        return "Subtask{" +
                 "name='" + getName() + '\'' +
                 ", description='" + getDescription() + '\'' +
                 ", id=" + getId() +
