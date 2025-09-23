@@ -3,11 +3,12 @@ package ru.yandex.javacourse;
 import ru.yandex.javacourse.model.Epic;
 import ru.yandex.javacourse.model.Status;
 import ru.yandex.javacourse.model.Subtask;
+import ru.yandex.javacourse.service.InMemoryTaskManager;
 import ru.yandex.javacourse.service.TaskManager;
 
 public class Main {
     public static void main(String[] args) {
-        TaskManager manager = new TaskManager();
+        InMemoryTaskManager manager = new InMemoryTaskManager();
 
 
         Epic epic1 = new Epic("Уборка", "всей квартиры");
