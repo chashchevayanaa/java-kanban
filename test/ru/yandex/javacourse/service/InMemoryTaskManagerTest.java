@@ -1,11 +1,22 @@
 package ru.yandex.javacourse.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
+
 import static org.junit.jupiter.api.Assertions.*;
+
 import ru.yandex.javacourse.model.*;
 
 class InMemoryTaskManagerTest {
+    private static final String TASK_NAME = "Task";
+    private static final String EPIC_NAME = "Epic";
+    private static final String SUBTASK_NAME = "Subtask";
+    private static final String DESCRIPTION = "Description";
+    private static final String ORIGINAL_NAME = "Original";
+    private static final String ORIGINAL_DESCRIPTION = "Original Description";
+    private static final String SUBTASK_DESC_1 = "Desc 1";
+    private static final String SUBTASK_NAME_1 = "Sub 1";
 
     private TaskManager taskManager;
 
@@ -15,10 +26,11 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void taskManagerShouldAddAndFindDifferentTaskTypes() {
-        Task task = new Task("Task", "Description");
-        Epic epic = new Epic("Epic", "Description");
-        Subtask subtask = new Subtask("Subtask", "Description", 2);
+    @DisplayName("Менеджер должен добавлять и находить задачи разных типов")
+    void addingTask_ShouldAddAndFindDifferentTaskTypes_WhenTasksAreAdded() {
+        Task task = new Task(TASK_NAME, DESCRIPTION);
+        Epic epic = new Epic(EPIC_NAME, DESCRIPTION);
+        Subtask subtask = new Subtask(SUBTASK_NAME, DESCRIPTION, 2);
 
         Task addedTask = taskManager.addingTask(task);
         Epic addedEpic = taskManager.addingEpic(epic);
@@ -31,8 +43,9 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void taskShouldRemainUnchangedWhenAddedToManager() {
-        Task originalTask = new Task("Original", "Original Description");
+    @DisplayName("Задача не должна изменяться при добавлении в менеджер")
+    void addingTask_ShouldNotChangeTask_WhenTaskAdded() {
+        Task originalTask = new Task(ORIGINAL_NAME, ORIGINAL_DESCRIPTION);
         originalTask.setStatus(Status.IN_PROGRESS);
 
         String originalName = originalTask.getName();
@@ -47,33 +60,35 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void epicCannotBeAddedAsItsOwnSubtask() {
-        Epic epic = new Epic("Epic", "Description");
+    @DisplayName("Подзадача должна добавляться к эпику")
+    void addingSubtask_ShouldAddSubtaskToEpic_WhenEpicExists() {
+        Epic epic = new Epic(EPIC_NAME, DESCRIPTION);
         taskManager.addingEpic(epic);
+        Subtask subtask = new Subtask(SUBTASK_NAME, DESCRIPTION, epic.getId());
 
-        Subtask subtask = new Subtask("Subtask", "Description", epic.getId());
         taskManager.addingSubtask(subtask);
 
         assertEquals(1, taskManager.gettingSubtaskByEpicId(epic.getId()).size());
     }
 
     @Test
-    void epicStatusShouldBeCalculatedCorrectly() {
-        Epic epic = taskManager.addingEpic(new Epic("Epic", "Description"));
-
-        Subtask subtask1 = new Subtask("Sub 1", "Desc 1", epic.getId());
+    @DisplayName("Статус эпика должен рассчитываться корректно когда все подзадачи новые")
+    void updateEpicStatus_ShouldBeNew_WhenAllSubtasksNew() {
+        Epic epic = taskManager.addingEpic(new Epic(EPIC_NAME, DESCRIPTION));
+        Subtask subtask1 = new Subtask(SUBTASK_NAME_1, SUBTASK_DESC_1, epic.getId());
         subtask1.setStatus(Status.NEW);
+
         taskManager.addingSubtask(subtask1);
 
         assertEquals(Status.NEW, epic.getStatus());
     }
 
     @Test
-    void deletingEpicShouldDeleteItsSubtasks() {
-        Epic epic = taskManager.addingEpic(new Epic("Epic", "Description"));
-        Subtask subtask = new Subtask("Subtask", "Description", epic.getId());
+    @DisplayName("Удаление эпика должно удалять его подзадачи")
+    void  removeEpicByID_ShouldDeleteEpicAndSubtasks_WhenEpicDeleted() {
+        Epic epic = taskManager.addingEpic(new Epic(EPIC_NAME, DESCRIPTION));
+        Subtask subtask = new Subtask(SUBTASK_NAME, DESCRIPTION, epic.getId());
         taskManager.addingSubtask(subtask);
-
         assertEquals(1, taskManager.getAllSubtask().size());
 
         taskManager.removeEpicByID(epic.getId());
