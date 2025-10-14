@@ -5,11 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import ru.yandex.javacourse.model.Status;
 import ru.yandex.javacourse.model.Task;
 
-import java.util.List;
-
 import static org.junit.Assert.assertEquals;
 
 public class InMemoryHistoryManagerTest {
+
     private static final String TASK_NAME = "Task";
     private static final String TASK_DESCRIPTION = "Description";
     private static final int TASK_ID_1 = 1;

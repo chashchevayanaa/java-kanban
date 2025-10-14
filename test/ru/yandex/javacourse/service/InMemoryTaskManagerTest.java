@@ -1,14 +1,17 @@
 package ru.yandex.javacourse.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
+import ru.yandex.javacourse.model.Epic;
+import ru.yandex.javacourse.model.Status;
+import ru.yandex.javacourse.model.Subtask;
+import ru.yandex.javacourse.model.Task;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import ru.yandex.javacourse.model.*;
-
 class InMemoryTaskManagerTest {
+
     private static final String TASK_NAME = "Task";
     private static final String EPIC_NAME = "Epic";
     private static final String SUBTASK_NAME = "Subtask";
@@ -85,7 +88,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     @DisplayName("Удаление эпика должно удалять его подзадачи")
-    void  removeEpicByID_ShouldDeleteEpicAndSubtasks_WhenEpicDeleted() {
+    void removeEpicByID_ShouldDeleteEpicAndSubtasks_WhenEpicDeleted() {
         Epic epic = taskManager.addingEpic(new Epic(EPIC_NAME, DESCRIPTION));
         Subtask subtask = new Subtask(SUBTASK_NAME, DESCRIPTION, epic.getId());
         taskManager.addingSubtask(subtask);

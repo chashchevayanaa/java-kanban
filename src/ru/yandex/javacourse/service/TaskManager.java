@@ -43,7 +43,6 @@ public interface TaskManager {
     void deleteAllSubtask();
 
     void updateSubtask(Subtask subtask);
-
 }
 
 
