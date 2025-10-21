@@ -88,13 +88,13 @@ class InMemoryTaskManagerTest {
 
     @Test
     @DisplayName("Удаление эпика должно удалять его подзадачи")
-    void removeEpicByID_ShouldDeleteEpicAndSubtasks_WhenEpicDeleted() {
+    void deleteEpicByID_ShouldDeleteEpicAndSubtasks_WhenEpicDeleted() {
         Epic epic = taskManager.addingEpic(new Epic(EPIC_NAME, DESCRIPTION));
         Subtask subtask = new Subtask(SUBTASK_NAME, DESCRIPTION, epic.getId());
         taskManager.addingSubtask(subtask);
         assertEquals(1, taskManager.getAllSubtask().size());
 
-        taskManager.removeEpicByID(epic.getId());
+        taskManager.deleteEpicByID(epic.getId());
 
         assertEquals(0, taskManager.getAllSubtask().size());
         assertNull(taskManager.gettingSubtaskById(subtask.getId()));
