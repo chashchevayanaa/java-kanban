@@ -1,9 +1,12 @@
 package ru.yandex.javacourse;
 
 import ru.yandex.javacourse.model.Epic;
+import ru.yandex.javacourse.model.Status;
 import ru.yandex.javacourse.model.Subtask;
 import ru.yandex.javacourse.model.Task;
 import ru.yandex.javacourse.service.*;
+
+import java.io.File;
 
 public class Main {
 
@@ -48,6 +51,39 @@ public class Main {
 
         manager.deleteEpicByID(epic1.getId());
         System.out.println(historyManager.getHistory());
+
+        File file = new File("tasks.csv");
+        FileBackedTaskManager manager1 = new FileBackedTaskManager(file);
+
+        Task newTask1 = new Task("Новая Задача 1", "Новое описание задачи 1");
+        Task newTask2 = new Task("Новая Задача 2", "Новое описание задачи 2");
+        manager1.addingTask(newTask1);
+        manager1.addingTask(newTask2);
+
+        Epic newEpic1 = new Epic("Новый Эпик 1", "Новое описание эпика 1");
+        manager1.addingEpic(newEpic1);
+
+        Subtask newSubtask1 = new Subtask("Новая Подзадача 1", "Новое описание подзадачи 1", newEpic1.getId());
+        Subtask newSubtask2 = new Subtask("Новая Подзадача 2", "Новое описание подзадачи 2", newEpic1.getId());
+        manager1.addingSubtask(newSubtask1);
+        manager1.addingSubtask(newSubtask2);
+
+        newTask2.setStatus(Status.DONE);
+        manager1.updateTask(newTask2);
+
+        newSubtask1.setStatus(Status.DONE);
+        manager1.updateSubtask(newSubtask1);
+
+        FileBackedTaskManager manager2 = FileBackedTaskManager.loadFromFile(file);
+
+        System.out.println("Задачи восстановлены: " + (manager2.getAllTasks().size() == 2));
+        System.out.println("Эпики восстановлены: " + (manager2.getAllEpic().size() == 1));
+        System.out.println("Подзадачи восстановлены: " + (manager2.getAllSubtask().size() == 2));
+
+        Epic restoredEpic = manager2.getAllEpic().get(0);
+        System.out.println("Статус эпика: " + restoredEpic.getStatus());
     }
 }
+
+
 
