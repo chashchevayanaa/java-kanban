@@ -1,15 +1,32 @@
 package ru.yandex.javacourse.service;
 
+import java.io.File;
+import java.io.IOException;
+
 public class Managers {
+
+    private static TaskManager taskManager;
+    private static HistoryManager historyManager;
 
     private Managers() {
     }
 
     public static TaskManager getDefault() {
-        return new InMemoryTaskManager();
+        if (taskManager == null) {
+            try {
+                File tempFile = File.createTempFile("tasks", ".csv");
+                taskManager = new FileBackedTaskManager(tempFile);
+            } catch (IOException e) {
+                throw new RuntimeException("Ошибка при создании временного файла", e);
+            }
+        }
+        return taskManager;
     }
 
     public static HistoryManager getDefaultHistory() {
-        return new InMemoryHistoryManager();
+        if (historyManager == null) {
+            historyManager = new InMemoryHistoryManager();
+        }
+        return historyManager;
     }
 }
