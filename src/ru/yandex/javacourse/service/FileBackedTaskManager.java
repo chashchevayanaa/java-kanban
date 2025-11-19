@@ -6,6 +6,8 @@ import ru.yandex.javacourse.model.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -90,9 +92,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         save();
     }
 
-    private void save() {
+    void save() {
         try {
-            String header = "id,type,name,status,description,epic\n";
+            String header = "id,type,name,status,description,epic,duration,startTime,endTime\n";
             StringBuilder content = new StringBuilder();
             content.append(header);
 
@@ -115,21 +117,34 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private String toString(Task task) {
         String type = TaskType.TASK.toString();
         String epic = "";
+        String endTime = "";
 
         if (task instanceof Epic) {
             type = TaskType.EPIC.toString();
+            endTime = formatDateTime(((Epic) task).getEndTime());
         } else if (task instanceof Subtask) {
             type = TaskType.SUBTASK.toString();
             epic = String.valueOf(((Subtask) task).getEpicId());
         }
 
-        return String.format("%d,%s,%s,%s,%s,%s",
+        return String.format("%d,%s,%s,%s,%s,%s,%s,%s,%s",
                 task.getId(),
                 type,
                 task.getName(),
                 task.getStatus(),
                 task.getDescription(),
-                epic);
+                epic,
+                formatDuration(task.getDuration()),
+                formatDateTime(task.getStartTime()),
+                endTime);
+    }
+
+    private String formatDuration(Duration duration) {
+        return duration != null ? String.valueOf(duration.toMinutes()) : "";
+    }
+
+    private String formatDateTime(LocalDateTime dateTime) {
+        return dateTime != null ? dateTime.toString() : "";
     }
 
     private Task fromString(String value) {
@@ -140,17 +155,26 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Status status = Status.valueOf(fields[3]);
         String description = fields[4];
         String epicId = fields.length > 5 ? fields[5] : "";
+        String durationStr = fields.length > 6 ? fields[6] : "";
+        String startTimeStr = fields.length > 7 ? fields[7] : "";
+        String endTimeStr = fields.length > 8 ? fields[8] : "";
+
+        Duration duration = durationStr.isEmpty() ? null : Duration.ofMinutes(Long.parseLong(durationStr));
+        LocalDateTime startTime = startTimeStr.isEmpty() ? null : LocalDateTime.parse(startTimeStr);
+        LocalDateTime endTime = endTimeStr.isEmpty() ? null : LocalDateTime.parse(endTimeStr);
 
         Task task;
         switch (type) {
             case TASK:
-                task = new Task(name, description);
+                task = new Task(name, description, duration, startTime);
                 break;
             case EPIC:
-                task = new Epic(name, description);
+                Epic epic = new Epic(name, description);
+                epic.setEndTime(endTime);
+                task = epic;
                 break;
             case SUBTASK:
-                task = new Subtask(name, description, Integer.parseInt(epicId));
+                task = new Subtask(name, description, Integer.parseInt(epicId), duration, startTime);
                 break;
             default:
                 throw new IllegalStateException("Неизвестный тип задачи: " + type);
@@ -158,6 +182,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         task.setId(id);
         task.setStatus(status);
+        if (duration != null) {
+            task.setDuration(duration);
+        }
+        if (startTime != null) {
+            task.setStartTime(startTime);
+        }
         return task;
     }
 
@@ -200,6 +230,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             manager.epics.putAll(epics);
             manager.subtasks.putAll(subtasks);
             manager.nextId = maxId + 1;
+
+            // Восстанавливаем prioritizedTasks
+            for (Task task : tasks.values()) {
+                manager.addToPrioritizedTasks(task);
+            }
+            for (Subtask subtask : subtasks.values()) {
+                manager.addToPrioritizedTasks(subtask);
+            }
 
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка загрузки из файла", e);

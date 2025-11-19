@@ -43,6 +43,10 @@ public interface TaskManager {
     void deleteAllSubtask();
 
     void updateSubtask(Subtask subtask);
+
+    List<Task> getPrioritizedTasks();
+
+    boolean isTaskOverlapping(Task task);
 }
 
 
