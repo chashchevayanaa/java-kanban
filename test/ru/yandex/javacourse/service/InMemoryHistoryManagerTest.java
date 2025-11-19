@@ -1,46 +1,135 @@
 package ru.yandex.javacourse.service;
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import ru.yandex.javacourse.model.Status;
+import org.junit.jupiter.api.Test;
 import ru.yandex.javacourse.model.Task;
 
-import static org.junit.Assert.assertEquals;
+import java.util.List;
 
-public class InMemoryHistoryManagerTest {
-    private static final String TASK_NAME = "Task";
-    private static final String TASK_DESCRIPTION = "Description";
-    private static final int TASK_ID = 1;
-    private static final int HISTORY_LIMIT = 10;
-    private static final int EXCESS_TASKS_COUNT = 15;
+import static org.junit.jupiter.api.Assertions.*;
 
-    InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
+class InMemoryHistoryManagerTest {
 
-    @Test
-    @DisplayName("Добавление задачи в историю должно корректно работать")
-    public void add_ShouldAddTaskToHistory_WhenTaskAdded() {
-        Task task = new Task(TASK_NAME, TASK_DESCRIPTION);
+    private HistoryManager historyManager;
+    private Task task1;
+    private Task task2;
+    private Task task3;
 
-        historyManager.add(task);
-        assertEquals(1, historyManager.getHistory().size());
-        task.setStatus(Status.IN_PROGRESS);
-        historyManager.add(task);
-        assertEquals(2, historyManager.getHistory().size());
-        historyManager.getHistory().clear();
+    @BeforeEach
+    void setUp() {
+        historyManager = new InMemoryHistoryManager();
+
+        task1 = new Task("Task1", "Description1");
+        task1.setId(1);
+
+        task2 = new Task("Task2", "Description2");
+        task2.setId(2);
+
+        task3 = new Task("Task3", "Description3");
+        task3.setId(3);
     }
 
     @Test
-    @DisplayName("История не должна превышать лимит в 10 задач")
-    public void add_ShouldNotExceedLimit_WhenManyTasksAdded() {
+    @DisplayName("Пустая история задач")
+    void getHistory_ShouldReturnEmptyList_WhenNoTasksAdded() {
+        List<Task> history = historyManager.getHistory();
 
-        for (int i = TASK_ID; i <= EXCESS_TASKS_COUNT; i++) {
-            Task task = new Task(TASK_NAME + i, TASK_DESCRIPTION);
-            task.setId(i);
-            historyManager.add(task);
-        }
+        assertTrue(history.isEmpty());
+    }
 
-        assertEquals(HISTORY_LIMIT, historyManager.getHistory().size());
-        historyManager.getHistory().clear();
+    @Test
+    @DisplayName("Дублирование задач в истории")
+    void add_ShouldRemoveDuplicates_WhenTaskAddedMultipleTimes() {
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task1);
+
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(2, history.size());
+        assertEquals(task2, history.get(0));
+        assertEquals(task1, history.get(1));
+    }
+
+    @Test
+    @DisplayName("Удаление из начала истории")
+    void remove_ShouldRemoveFromBeginning_WhenFirstTaskRemoved() {
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(task1.getId());
+
+        List<Task> history = historyManager.getHistory();
+        assertEquals(2, history.size());
+        assertEquals(task2, history.get(0));
+        assertEquals(task3, history.get(1));
+        assertFalse(history.contains(task1));
+    }
+
+    @Test
+    @DisplayName("Удаление из середины истории")
+    void remove_ShouldRemoveFromMiddle_WhenMiddleTaskRemoved() {
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(task2.getId());
+
+        List<Task> history = historyManager.getHistory();
+        assertEquals(2, history.size());
+        assertEquals(task1, history.get(0));
+        assertEquals(task3, history.get(1));
+        assertFalse(history.contains(task2));
+    }
+
+    @Test
+    @DisplayName("Удаление из конца истории")
+    void remove_ShouldRemoveFromEnd_WhenLastTaskRemoved() {
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        historyManager.remove(task3.getId());
+
+        List<Task> history = historyManager.getHistory();
+        assertEquals(2, history.size());
+        assertEquals(task1, history.get(0));
+        assertEquals(task2, history.get(1));
+        assertFalse(history.contains(task3));
+    }
+
+    @Test
+    @DisplayName("Порядок истории при добавлении задач")
+    void getHistory_ShouldMaintainOrder_WhenTasksAdded() {
+        historyManager.add(task1);
+        historyManager.add(task2);
+        historyManager.add(task3);
+
+        List<Task> history = historyManager.getHistory();
+
+        assertEquals(3, history.size());
+        assertEquals(task1, history.get(0));
+        assertEquals(task2, history.get(1));
+        assertEquals(task3, history.get(2));
+    }
+
+    @Test
+    @DisplayName("Добавление null задачи")
+    void add_ShouldNotAdd_WhenTaskIsNull() {
+        historyManager.add(null);
+
+        List<Task> history = historyManager.getHistory();
+        assertTrue(history.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Удаление несуществующей задачи")
+    void remove_ShouldNotFail_WhenTaskNotInHistory() {
+        historyManager.remove(999);
+
+        List<Task> history = historyManager.getHistory();
+        assertTrue(history.isEmpty());
     }
 }
-

@@ -14,7 +14,7 @@ public interface TaskManager {
 
     Task gettingTaskById(int id);
 
-    void deletionByID(int id);
+    void deleteTaskByID(int id);
 
     void updateTask(Task task);
 
@@ -26,7 +26,7 @@ public interface TaskManager {
 
     void removeEpics();
 
-    void removeEpicByID(int id);
+    void deleteEpicByID(int id);
 
     ArrayList<Subtask> gettingSubtaskByEpicId(int id);
 
@@ -44,6 +44,9 @@ public interface TaskManager {
 
     void updateSubtask(Subtask subtask);
 
+    List<Task> getPrioritizedTasks();
+
+    boolean isTaskOverlapping(Task task);
 }
 
 
