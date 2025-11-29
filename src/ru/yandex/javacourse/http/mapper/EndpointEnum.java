@@ -1,0 +1,23 @@
+package ru.yandex.javacourse.http.mapper;
+
+public enum EndpointEnum {
+    GET_ALL_TASKS,
+    GET_TASK,
+    DELETE_TASK,
+    CREATE_TASK,
+    UPDATE_TASK,
+    GET_ALL_SUBTASKS,
+    GET_SUBTASK,
+    DELETE_SUBTASK,
+    CREATE_SUBTASK,
+    UPDATE_SUBTASK,
+    GET_ALL_EPICS,
+    GET_EPIC,
+    GET_EPIC_SUBTASKS,
+    DELETE_EPIC,
+    CREATE_EPIC,
+    UPDATE_EPIC,
+    GET_HISTORY,
+    GET_PRIORITIZED_TASKS,
+    UNKNOWN
+}
