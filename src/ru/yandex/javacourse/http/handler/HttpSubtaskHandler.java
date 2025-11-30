@@ -41,7 +41,7 @@ public class HttpSubtaskHandler implements HttpHandler {
                     baseHttpHandler.sendServerError(exchange, e.getMessage(), path);
                 }
             }
-            case GET_SUBTASK ->  {
+            case GET_SUBTASK -> {
                 try {
                     int subtaskId = Integer.parseInt(path.replaceAll("\\D+", ""));
                     response = gson.toJson(taskManager.gettingSubtaskById(subtaskId));
@@ -54,7 +54,7 @@ public class HttpSubtaskHandler implements HttpHandler {
                     baseHttpHandler.sendServerError(exchange, e.getMessage(), path);
                 }
             }
-            case DELETE_SUBTASK ->  {
+            case DELETE_SUBTASK -> {
                 taskManager.deleteSubtaskById(Integer.parseInt(path.replaceAll("\\D+", "")));
                 baseHttpHandler.sendText(exchange, "Подзадача удалена", path);
             }
@@ -70,7 +70,7 @@ public class HttpSubtaskHandler implements HttpHandler {
                     baseHttpHandler.sendServerError(exchange, e.getMessage(), path);
                 }
             }
-            case UPDATE_SUBTASK ->  {
+            case UPDATE_SUBTASK -> {
                 try {
                     InputStream bodyInput = exchange.getRequestBody();
                     String body = new String(bodyInput.readAllBytes());

@@ -8,7 +8,6 @@ import ru.yandex.javacourse.http.adapter.DurationAdapter;
 import ru.yandex.javacourse.http.adapter.LocalDateTimeAdapter;
 import ru.yandex.javacourse.http.mapper.EndpointMapper;
 import ru.yandex.javacourse.model.Epic;
-import ru.yandex.javacourse.model.Task;
 import ru.yandex.javacourse.service.Managers;
 import ru.yandex.javacourse.service.TaskManager;
 
@@ -35,7 +34,7 @@ public class HttpEpicHandler implements HttpHandler {
 
         switch (EndpointMapper.mapEndpoint(method, path)) {
 
-            case GET_ALL_EPICS-> {
+            case GET_ALL_EPICS -> {
                 try {
                     response = gson.toJson(taskManager.getAllEpic());
                     baseHttpHandler.sendText(exchange, response, path);
@@ -56,7 +55,7 @@ public class HttpEpicHandler implements HttpHandler {
                     baseHttpHandler.sendServerError(exchange, e.getMessage(), path);
                 }
             }
-            case DELETE_EPIC-> {
+            case DELETE_EPIC -> {
                 taskManager.deleteEpicByID(Integer.parseInt(path.replaceAll("\\D+", "")));
                 baseHttpHandler.sendText(exchange, "Эпик удален", path);
             }
