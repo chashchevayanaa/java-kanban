@@ -1,5 +1,6 @@
 package ru.yandex.javacourse.service;
 
+import ru.yandex.javacourse.exception.TimeConflictException;
 import ru.yandex.javacourse.model.Epic;
 import ru.yandex.javacourse.model.Status;
 import ru.yandex.javacourse.model.Subtask;
@@ -33,7 +34,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (isTaskOverlapping(task)) {
-            throw new IllegalArgumentException("Задача пересекается по времени с существующей задачей");
+            throw new TimeConflictException("Задача пересекается по времени с существующей задачей");
         }
 
         task.setId(nextId);
@@ -86,7 +87,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (isTaskOverlapping(task)) {
             prioritizedTasks.add(existingTask); // Возвращаем обратно
-            throw new IllegalArgumentException("Обновленная задача пересекается по времени с существующей задачей");
+            throw new TimeConflictException("Обновленная задача пересекается по времени с существующей задачей");
         }
 
         tasks.put(task.getId(), task);
@@ -174,7 +175,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
 
         if (isTaskOverlapping(subtask)) {
-            throw new IllegalArgumentException("Подзадача пересекается по времени с существующей задачей");
+            throw new TimeConflictException("Подзадача пересекается по времени с существующей задачей");
         }
 
         subtask.setId(nextId);
@@ -247,7 +248,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         if (isTaskOverlapping(subtask)) {
             prioritizedTasks.add(existingSubtask); // Возвращаем обратно
-            throw new IllegalArgumentException("Обновленная подзадача пересекается по времени с существующей задачей");
+            throw new TimeConflictException("Обновленная подзадача пересекается по времени с существующей задачей");
         }
 
         subtasks.put(subtask.getId(), subtask);

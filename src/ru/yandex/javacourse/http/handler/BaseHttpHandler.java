@@ -61,4 +61,13 @@ public class BaseHttpHandler implements HttpHandler {
         }
         return handler;
     }
+
+    public void sendCreated(HttpExchange exchange, String response, String path) throws IOException {
+        byte[] resp = response.getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        exchange.sendResponseHeaders(201, resp.length); // ← 201, а не 200
+        exchange.getResponseBody().write(resp);
+        System.out.println("\t" + path + " 201 created");
+        exchange.close();
+    }
 }
