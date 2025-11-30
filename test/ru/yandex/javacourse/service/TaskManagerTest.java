@@ -3,6 +3,7 @@ package ru.yandex.javacourse.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import ru.yandex.javacourse.exception.TimeConflictException;
 import ru.yandex.javacourse.model.*;
 
 import java.time.Duration;
@@ -406,7 +407,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.addingTask(task1);
 
-        assertThrows(IllegalArgumentException.class, () -> taskManager.addingTask(task2));
+        assertThrows(TimeConflictException.class, () -> taskManager.addingTask(task2));
     }
 
     @Test
